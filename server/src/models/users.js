@@ -1,3 +1,4 @@
+// this file is to create the user, all the qualities and requirements that define them
 const mongoose = require('mongoose');
 const validator = require('validator');
 
