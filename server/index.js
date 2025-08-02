@@ -26,3 +26,5 @@ app.listen(PORT, () => {
 });
 // start listening for requests on the specified port
 
+const spotifyLoginRouter = require('./src/routes/spotifyLogin'); // Adjust the path if necessary
+app.use('/', spotifyLoginRouter);

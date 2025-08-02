@@ -3,9 +3,10 @@ const mongoose = require('mongoose');
 const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
-    name : {
+    spotifyID : {
         type : String, 
-        required : [true, "Please enter your name"]
+        required : true, 
+        unique: true
     }, 
     email : {
         type : String, 
@@ -13,27 +14,7 @@ const userSchema = new mongoose.Schema({
         unique : true, //cannot have duplicate emails
         validate : [validator.isEmail, "Please enter a valid email address"]
     },
-    role : {
-        type: String,
-        enum : {
-            values : ['student', 'employer'],
-            message : 'Please select correct role for user'
-        },
-        default : 'user'
-    },
-    password : {
-        type : String, 
-        required : [true, "Please enter a password for your account"],
-        minlength : [8, 'Your password must be at least 8 characters long'],
-        select : false //hide password
-    },
-    createdAt : {
-        type : Date, 
-        default : Date.now
-    }, 
-    resetPasswordToken : String, 
-    resetPasswordExprire : Date
-
+    displayName : String, 
 });
 
 module.exports = mongoose.model('User', userSchema);
