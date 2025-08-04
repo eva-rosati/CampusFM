@@ -1,4 +1,5 @@
-// this file is to create the user, all the qualities and requirements that define them
+// mongodb schema for users
+
 const mongoose = require('mongoose');
 const validator = require('validator');
 
@@ -15,6 +16,16 @@ const userSchema = new mongoose.Schema({
         validate : [validator.isEmail, "Please enter a valid email address"]
     },
     displayName : String, 
+    accessToken: {
+        ciphertext : { type:String, required: true },
+        iv : { type:String, required: true },
+        tag : { type:String, required: true },
+    },
+    refreshToken : {
+        ciphertext : { type:String, required: true },
+        iv : { type:String, required: true },
+        tag : { type:String, required: true },
+    }
 });
 
 module.exports = mongoose.model('User', userSchema);

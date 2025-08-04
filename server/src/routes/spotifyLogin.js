@@ -1,8 +1,12 @@
+// managing the spotify authorization flow
+
 const express = require('express'); // import express
 const querystring = require('querystring');
 const router = express.Router(); // create a new router instance
 const axios = require('axios'); // import axios for making HTTP requests
 const User = require('../models/users.js'); // import the User model
+const crypto = require('crypto'); // for encrypting tokens
+const { encryptSymmetric, decryptSymmetric } = require('../utils/tokenSafety.js');
 
 
 const client_id = process.env.SPOTIFY_CLIENT_ID;
@@ -21,10 +25,10 @@ function generateRandomString(length) { // generating a random, string and sendi
   }
 
 router.get('/login', function(req, res) {
-
   const state = generateRandomString(16); // each request has a different state value, protect against CSRF attacks
+  req.session.state = state ;
   const scope = 'user-read-private user-read-email'; // asking the user for these permissions with their data
-
+  
   // redirecting to the spotify login page
   res.redirect('https://accounts.spotify.com/authorize?' + 
     querystring.stringify({ // query parameters
@@ -40,10 +44,13 @@ router.get('/login', function(req, res) {
 router.get('/callback', async function(req, res) {
   const code = req.query.code || null; // user-specific to used for auth tokens
   const state = req.query.state || null; // security 
-
-  if (state === null) {
+ 
+  if (state !== req.session.state) {
     return res.redirect('/#' +
       querystring.stringify({ error: 'state_mismatch' }));
+  }
+  if (!code) {
+    return res.status(400).json({ error: 'Authorization code is missing or invalid.' });
   }
 
   try {
@@ -56,18 +63,54 @@ router.get('/callback', async function(req, res) {
       {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
-          'Authorization': 'Basic ' + Buffer.from(client_id + ':' + client_secret).toString('base64')
+          'Authorization': 'Basic ' + Buffer.from(process.env.SPOTIFY_CLIENT_ID + ':' + process.env.SPOTIFY_CLIENT_SECRET).toString('base64')
         }
       }
     );
 
-    const access_token = tokenResponse.data.access_token; // extract tokens from the response, temp token
-    const refresh_token = tokenResponse.data.refresh_token; // allows user to not repeatedly have to login
+    const { access_token, refresh_token } = tokenResponse.data; // extract tokens from the response, temp token
+
+    // encrypt tokens using the imported encryption function 
+    const encryptionKey = process.env.ENCRYPTION_KEY;
+    const encryptedAccessToken = encryptSymmetric(encryptionKey, access_token);
+    const encryptedRefreshToken = encryptSymmetric(encryptionKey, refresh_token);
+
+    const userProfileResponse = await axios.get('https://api.spotify.com/v1/me', {
+      headers: {
+        'Authorization': `Bearer ${access_token}` // use the access token to authenticate the request
+      }
+    });
+
+    console.log('User profile response:', userProfileResponse.data);
+    console.log('Token response:', tokenResponse.data);
+    // get user info from spotify
+    const { id: spotifyID, display_name: displayName, email } = userProfileResponse.data;
+
+
+
+    // create new user in the database and save encrypted tokens
+    const user = new User ({
+      spotifyID, 
+      email,
+      displayName,
+      accessToken: {
+        ciphertext: encryptedAccessToken.ciphertext,
+        iv: encryptedAccessToken.iv, 
+        tag: encryptedAccessToken.tag
+      },
+      refreshToken: {
+        ciphertext: encryptedRefreshToken.ciphertext,
+        iv: encryptedRefreshToken.iv, 
+        tag: encryptedRefreshToken.tag
+      },
+    });
+
+    await user.save(); // save user to mongodb database
+
 
     res.json({
-      message: 'Success! Tokens received.',
-      access_token,
-      refresh_token
+      message: 'Success! User logged in and tokens saved.',
+  
     });
 
   } catch (error) { // catch any errors in the token exchange process

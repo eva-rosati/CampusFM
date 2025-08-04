@@ -1,10 +1,16 @@
-require('dotenv').config({ path: __dirname + '/.env' }); // Explicitly load .env file
-console.log('MONGO_URI:', process.env.MONGO_URI); // Debug log to verify MONGO_URI
+// server setup and mongodb connect
+
+require('dotenv').config({ path: __dirname + '/.env' }); // explicitly load .env file
+console.log('MONGO_URI:', process.env.MONGO_URI); // debug log to verify MONGO_URI
 
 const express = require('express'); // import express
 const mongoose = require('mongoose'); // import mongoose for MongoDB connection
+const spotifyLoginRouter = require('./src/routes/spotifyLogin'); 
+const session = require('express-session');
+
 
 const app = express(); // create instance of an express application
+
 
 // get variables from process.env
 const PORT = process.env.PORT || 3000;
@@ -16,6 +22,17 @@ mongoose.connect(MONGO_URI)
   .then(() => console.log('MongoDB connected successfully!'))
   .catch(err => console.error('MongoDB connection error:', err));
 
+
+  app.use(session({
+    secret: process.env.SESSION_SECRET || process.env.SESSION_SECRET, // Use a secure secret key
+    resave: false,
+    saveUninitialized: true,
+    cookie: { secure: false }, // Set to true if using HTTPS
+  })); 
+
+app.use('/', spotifyLoginRouter);
+
+
 app.get('/', (req, res) => {
   res.send('Server is up and running!');
 });
@@ -26,5 +43,3 @@ app.listen(PORT, () => {
 });
 // start listening for requests on the specified port
 
-const spotifyLoginRouter = require('./src/routes/spotifyLogin'); // Adjust the path if necessary
-app.use('/', spotifyLoginRouter);
