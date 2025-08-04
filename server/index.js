@@ -13,7 +13,7 @@ const app = express(); // create instance of an express application
 
 
 // get variables from process.env
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT_HOST || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
 // connect to mongodb
