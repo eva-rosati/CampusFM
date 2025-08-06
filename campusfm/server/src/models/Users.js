@@ -25,7 +25,9 @@ const userSchema = new mongoose.Schema({
         ciphertext : { type:String, required: true },
         iv : { type:String, required: true },
         tag : { type:String, required: true },
-    }
+    },
+    topGenres: [String],
+    topArtists: [String]
 });
 
 module.exports = mongoose.model('User', userSchema);

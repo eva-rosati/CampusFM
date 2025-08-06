@@ -7,6 +7,8 @@ const express = require('express'); // import express
 const mongoose = require('mongoose'); // import mongoose for MongoDB connection
 const spotifyLoginRouter = require('./src/routes/spotifyLogin'); 
 const session = require('express-session');
+const MongoStore = require('connect-mongo'); // use to avoid memory leaks, preparing for production
+
 
 
 const app = express(); // create instance of an express application
@@ -17,18 +19,25 @@ const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
 // connect to mongodb
-mongoose.connect(MONGO_URI)
-// useNewUrlParser and useUnifiedTopology are options to avoid warnings and use latest drivers
+mongoose.connect(MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+})// useNewUrlParser and useUnifiedTopology are options to avoid warnings and use latest drivers
   .then(() => console.log('MongoDB connected successfully!'))
   .catch(err => console.error('MongoDB connection error:', err));
 
 
+  
   app.use(session({
-    secret: process.env.SESSION_SECRET || process.env.SESSION_SECRET, // Use a secure secret key
+    secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: true,
-    cookie: { secure: false }, // Set to true if using HTTPS
-  })); 
+    saveUninitialized: false,
+    store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
+    cookie: {
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
+    }
+  }));
 
 app.use('/', spotifyLoginRouter);
 

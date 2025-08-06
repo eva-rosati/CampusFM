@@ -9,9 +9,9 @@ const crypto = require('crypto'); // for encrypting tokens
 const { encryptSymmetric, decryptSymmetric } = require('../utils/tokenSafety.js');
 
 
-const client_id = process.env.SPOTIFY_CLIENT_ID;
-const client_secret = process.env.SPOTIFY_CLIENT_SECRET;
-const redirect_uri = process.env.SPOTIFY_REDIRECT_URI;
+const client_id=process.env.SPOTIFY_CLIENT_ID;
+const client_secret=process.env.SPOTIFY_CLIENT_SECRET;
+const redirect_uri=process.env.SPOTIFY_REDIRECT_URI.trim();
 
 function generateRandomString(length) { // generating a random, string and sending as state parameter verif legit request frm spotify
     let text = '';
@@ -27,7 +27,7 @@ function generateRandomString(length) { // generating a random, string and sendi
 router.get('/login', function(req, res) {
   const state = generateRandomString(16); // each request has a different state value, protect against CSRF attacks
   req.session.state = state ;
-  const scope = 'user-read-private user-read-email'; // asking the user for these permissions with their data
+  const scope = 'user-read-private user-read-email user-top-read'; // asking the user for these permissions with their data
   
   // redirecting to the spotify login page
   res.redirect('https://accounts.spotify.com/authorize?' + 
@@ -69,6 +69,8 @@ router.get('/callback', async function(req, res) {
     );
 
     const { access_token, refresh_token } = tokenResponse.data; // extract tokens from the response, temp token
+    req.session.accessToken = access_token; // save to session
+    
 
     // encrypt tokens using the imported encryption function 
     const encryptionKey = process.env.ENCRYPTION_KEY;
@@ -86,37 +88,53 @@ router.get('/callback', async function(req, res) {
     // get user info from spotify
     const { id: spotifyID, display_name: displayName, email } = userProfileResponse.data;
 
-
+    const topArtistsResponse = await axios.get('https://api.spotify.com/v1/me/top/artists', {
+      headers: { 'Authorization': `Bearer ${access_token}` }
+    });
+    const topArtists = topArtistsResponse.data.items.map(artist => artist.name);
+    const topGenres = [...new Set(topArtistsResponse.data.items.flatMap(artist => artist.genres))];
 
     // create new user in the database and save encrypted tokens
-    const user = new User ({
-      spotifyID, 
-      email,
-      displayName,
-      accessToken: {
-        ciphertext: encryptedAccessToken.ciphertext,
-        iv: encryptedAccessToken.iv, 
-        tag: encryptedAccessToken.tag
+    await User.findOneAndUpdate( // automatically checks for duplicate users
+      { spotifyID },
+      {
+        email,
+        displayName,
+        accessToken: {
+          ciphertext: encryptedAccessToken.ciphertext,
+          iv: encryptedAccessToken.iv,
+          tag: encryptedAccessToken.tag
+        },
+        refreshToken: {
+          ciphertext: encryptedRefreshToken.ciphertext,
+          iv: encryptedRefreshToken.iv,
+          tag: encryptedRefreshToken.tag
+        },
+        topArtists,
+        topGenres
       },
-      refreshToken: {
-        ciphertext: encryptedRefreshToken.ciphertext,
-        iv: encryptedRefreshToken.iv, 
-        tag: encryptedRefreshToken.tag
-      },
-    });
+      { upsert: true, new: true }
+    );
 
-    await user.save(); // save user to mongodb database
-
-
-    res.json({
-      message: 'Success! User logged in and tokens saved.',
-  
-    });
+    res.redirect('/dashboard'); //redirect to dashboard after logging in
 
   } catch (error) { // catch any errors in the token exchange process
     console.error('Error getting tokens:', error.response?.data || error.message);
     res.status(500).send('Error during authentication');
   }
+});
+
+router.get('/dashboard', async function(req, res) {
+  const accessToken = req.session.accessToken; // retrieve spotify access token from session
+
+  const userResponse = await axios.get('https://api.spotify.com/v1/me',{
+    headers: {
+      'Authorization': `Bearer ${accessToken}` // get user access token with api call
+    }
+  });
+  res.json(userResponse.data);
+
+
 });
 
 
