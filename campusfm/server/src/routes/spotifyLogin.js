@@ -98,6 +98,7 @@ router.get('/callback', async function(req, res) {
     await User.findOneAndUpdate( // automatically checks for duplicate users
       { spotifyID },
       {
+        spotifyID,
         email,
         displayName,
         accessToken: {
