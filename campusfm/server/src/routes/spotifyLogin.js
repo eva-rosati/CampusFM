@@ -24,6 +24,7 @@ function generateRandomString(length) { // generating a random, string and sendi
     return text; 
   }
 
+
 router.get('/login', function(req, res) {
   const state = generateRandomString(16); // each request has a different state value, protect against CSRF attacks
   req.session.state = state ;
