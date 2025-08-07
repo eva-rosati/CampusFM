@@ -27,7 +27,8 @@ const userSchema = new mongoose.Schema({
         tag : { type:String, required: true },
     },
     topGenres: [String],
-    topArtists: [String]
+    topArtists: [String], 
+    topTracks: [String]
 });
 
 module.exports = mongoose.model('User', userSchema);
