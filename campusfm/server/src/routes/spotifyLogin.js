@@ -119,25 +119,13 @@ router.get('/callback', async function(req, res) {
       { upsert: true, new: true }
     );
 
-    res.redirect('/dashboard'); //redirect to dashboard after logging in
+    res.redirect('http://localhost:5173/dashboard');
 
   } catch (error) { // catch any errors in the token exchange process
     console.error('Error getting tokens:', error.response?.data || error.message);
     res.status(500).send('Error during authentication');
   }
   console.log('Session state:', req.session.state, 'Returned state:', state);
-});
-
-router.get('/dashboard', async function(req, res) {
-  const accessToken = req.session.accessToken; // retrieve spotify access token from session
-
-  const userResponse = await axios.get('https://api.spotify.com/v1/me',{
-    headers: {
-      'Authorization': `Bearer ${accessToken}` // get user access token with api call
-    }
-  });
-  res.json(userResponse.data);
-
 });
 
 

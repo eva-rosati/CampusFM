@@ -1,14 +1,15 @@
 import React from 'react';
-import Dashboard from './components/Dashboard';
-import SimilarUsers from './components/SimilarUsers';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Landing from './pages/Landing';
+import Dashboard from './pages/Dashboard';
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <Dashboard />
-      <SimilarUsers />
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<Landing />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+      </Routes>
+    </Router>
   );
 }
-
-export default App;

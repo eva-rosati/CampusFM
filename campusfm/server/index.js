@@ -8,6 +8,7 @@ const mongoose = require('mongoose'); // import mongoose for MongoDB connection
 const spotifyLoginRouter = require('./src/routes/spotifyLogin'); 
 const session = require('express-session');
 const MongoStore = require('connect-mongo'); // use to avoid memory leaks, preparing for production
+const cors = require('cors'); // allow localhost frontend to interact with backend
 
 
 
@@ -27,16 +28,26 @@ mongoose.connect(MONGO_URI, {
   .catch(err => console.error('MongoDB connection error:', err));
 
 
-  
+  app.use(cors({
+    origin: 'http://localhost:5173', 
+    credentials: true                 // allow sending cookies/session credentials
+  }));
+
+  const isProduction = process.env.NODE_ENV === 'production'; //cross origin cookie sharing
+
   app.use(session({
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     cookie: {
-      secure: true,
-      sameSite: 'none'
-    }
+      secure: isProduction,
+      sameSite: isProduction ? 'none':'lax',
+      httpOnly: true,
+      maxAge: 24*60*60*1000,
+    },
+    
+    
   }));
 
 app.use('/', spotifyLoginRouter);
