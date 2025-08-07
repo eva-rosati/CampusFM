@@ -6,6 +6,12 @@ h1 {
   font-family: 'Russo One', sans-serif;
 }
 
+.weird-font {
+  font-family: 'Monoton', cursive;
+  font-size: 2.5rem;
+  letter-spacing: 2px;
+  color: #a259ff;
+}
 .landing-container {
     position: relative;
     min-height: 100vh;
@@ -127,7 +133,7 @@ h1 {
     background: #1ed760;
     top: 85%;
     left: 75%;
-    animation: liquidBounce3 12s ease-in-out infinite alternate;
+    animation: liquidBounce2 12s ease-in-out infinite alternate;
     animation-delay: 4s;
   }
 
@@ -137,10 +143,19 @@ h1 {
     background: #271ed7;
     top: 10%;
     left: 75%;
-    animation: liquidBounce3 12s ease-in-out infinite alternate;
+    animation: liquidBounce1 12s ease-in-out infinite alternate;
     animation-delay: 4s;
   }
   
+  .blob7 {
+    width: 400px;
+    height: 400px;
+    background: #271ed7;
+    top: 10%;
+    left: 75%;
+    animation: liquidBounce1 12s ease-in-out infinite alternate;
+    animation-delay: 4s;
+  }
   
   @keyframes liquidBounce1 {
     0% {
@@ -210,75 +225,8 @@ h1 {
       border-radius: 60% 60% 40% 40% / 60% 40% 60% 40%;
     }
   }
-  @keyframes liquidBounce4 {
-    0% {
-      transform: translate(0, 0) scale(1);
-      border-radius: 60% 50% 55% 45% / 50% 60% 45% 55%;
-    }
-    25% {
-      transform: translate(45px, 35px) scale(1.1);
-      border-radius: 50% 60% 45% 55% / 60% 50% 55% 45%;
-    }
-    50% {
-      transform: translate(30px, 60px) scale(0.95);
-      border-radius: 55% 45% 60% 40% / 45% 55% 60% 40%;
-    }
-    75% {
-      transform: translate(60px, 40px) scale(1.05);
-      border-radius: 45% 60% 50% 60% / 55% 40% 50% 60%;
-    }
-    100% {
-      transform: translate(0, 0) scale(1);
-      border-radius: 60% 50% 55% 45% / 50% 60% 45% 55%;
-    }
-  }
 
-  @keyframes liquidBounce5 {
-    0% {
-      transform: translate(0, 0) scale(1);
-      border-radius: 60% 50% 55% 45% / 50% 60% 45% 55%;
-    }
-    25% {
-      transform: translate(45px, 35px) scale(1.1);
-      border-radius: 50% 60% 45% 55% / 60% 50% 55% 45%;
-    }
-    50% {
-      transform: translate(30px, 60px) scale(0.95);
-      border-radius: 55% 45% 60% 40% / 45% 55% 60% 40%;
-    }
-    75% {
-      transform: translate(60px, 40px) scale(1.05);
-      border-radius: 45% 60% 50% 60% / 55% 40% 50% 60%;
-    }
-    100% {
-      transform: translate(0, 0) scale(1);
-      border-radius: 60% 50% 55% 45% / 50% 60% 45% 55%;
-    }
-  }
-  @keyframes liquidBounce7 {
-    
-      0% {
-        transform: translate(0, 0) scale(1);
-        border-radius: 60% 40% 60% 40% / 50% 60% 40% 60%;
-      }
-      25% {
-        transform: translate(50px, 20px) scale(1.1);
-        border-radius: 40% 60% 40% 60% / 60% 40% 60% 40%;
-      }
-      50% {
-        transform: translate(30px, 50px) scale(0.9);
-        border-radius: 55% 45% 55% 45% / 45% 55% 45% 55%;
-      }
-      75% {
-        transform: translate(60px, 40px) scale(1.05);
-        border-radius: 45% 55% 45% 55% / 55% 45% 55% 45%;
-      }
-      100% {
-        transform: translate(0, 0) scale(1);
-        border-radius: 60% 40% 60% 40% / 50% 60% 40% 60%;
-      }
-    }
-  
+
   
   html, body {
     margin: 0;
@@ -297,4 +245,3 @@ h1 {
   .blob {
     filter: blur(5px);
   }
-  

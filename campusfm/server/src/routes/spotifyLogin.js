@@ -100,7 +100,11 @@ router.get('/callback', async function(req, res) {
     });
     const topArtists = topArtistsResponse.data.items.map(artist => artist.name);
     const topGenres = [...new Set(topArtistsResponse.data.items.flatMap(artist => artist.genres))];
-
+    
+    const topTracksResponse = await axios.get('https://api.spotify.com/v1/me/top/tracks', {
+      headers: { 'Authorization': `Bearer ${access_token}` }
+    });
+    const topTracks = topTracksResponse.data.items.map(track => track.name);
     // create new user in the database and save encrypted tokens
     await User.findOneAndUpdate( // automatically checks for duplicate users
       { spotifyID },
@@ -119,7 +123,8 @@ router.get('/callback', async function(req, res) {
           tag: encryptedRefreshToken.tag
         },
         topArtists,
-        topGenres
+        topGenres, 
+        topTracks
       },
       { upsert: true, new: true }
     );

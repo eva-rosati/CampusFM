@@ -13,15 +13,20 @@ export default function Landing() {
       <div className= "blob blob7"></div>
 
 
-      <div className="content">
-        <h1>Welcome to CampusFM</h1>
-        <p>Find your frequency</p>
-        <button
-          onClick={() => window.location.href = 'https://fierce-bayou-71060-279ece732152.herokuapp.com/login'}
-        >
-          Login with Spotify
-        </button>
-      </div>
+      
+<div className="content">
+  <h1>Welcome to CampusFM</h1>
+  <p>
+    <span className="weird-font">Find your <span className="weird-font">frequency</span></span>
+
+  </p>
+  <button
+    onClick={() => window.location.href = 'https://fierce-bayou-71060-279ece732152.herokuapp.com/login'}
+  >
+    Login with Spotify
+  </button>
+</div>
+
     </div>
   );
 }
