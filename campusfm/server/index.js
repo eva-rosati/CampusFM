@@ -9,11 +9,14 @@ const spotifyLoginRouter = require('./src/routes/spotifyLogin');
 const session = require('express-session');
 const MongoStore = require('connect-mongo'); // use to avoid memory leaks, preparing for production
 const cors = require('cors'); // allow localhost frontend to interact with backend
+const cookieParser = require('cookie-parser');
 
 
 
 const app = express(); // create instance of an express application
+app.set('trust proxy', 1); 
 
+app.use(cookieParser());
 
 // get variables from process.env
 const PORT = process.env.PORT || 3000;
@@ -29,11 +32,13 @@ mongoose.connect(MONGO_URI, {
 
 
   app.use(cors({
-    origin: 'http://localhost:5173', 
-    credentials: true                 // allow sending cookies/session credentials
+    origin: 'http://localhost:5173',
+    credentials: true,
+    methods: ['GET', 'POST', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization']
   }));
 
-  const isProduction = process.env.NODE_ENV === 'production'; //cross origin cookie sharing
+  const isProduction = process.env.NODE_ENV === 'production';
 
   app.use(session({
     secret: process.env.SESSION_SECRET,
@@ -42,13 +47,20 @@ mongoose.connect(MONGO_URI, {
     store: MongoStore.create({ mongoUrl: process.env.MONGO_URI }),
     cookie: {
       secure: isProduction,
-      sameSite: isProduction ? 'none':'lax',
+      sameSite: isProduction ? 'none' : 'lax',
       httpOnly: true,
       maxAge: 24*60*60*1000,
     },
     
     
   }));
+
+
+  app.use((req, res, next) => {
+    console.log('Session ID:', req.sessionID);
+    console.log('Session data:', req.session);
+    next();
+  });
 
 app.use('/', spotifyLoginRouter);
 

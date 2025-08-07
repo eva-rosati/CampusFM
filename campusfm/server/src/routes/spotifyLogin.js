@@ -44,6 +44,11 @@ router.get('/login', function(req, res) {
 
 
 router.get('/callback', async function(req, res) {
+  console.log('Received callback with state:', req.query.state);
+  console.log('Session state:', req.session.state);
+  console.log('Session ID:', req.sessionID);
+  console.log('Session data:', req.session);
+  
   const code = req.query.code || null; // user-specific to used for auth tokens
   const state = req.query.state || null; // security 
  
