@@ -38,6 +38,8 @@ router.get('/login', function(req, res) {
       redirect_uri: redirect_uri, // redirect after they log in
       state: state
     }));
+  console.log('Session state set:', req.session.state);
+
 });
 
 
@@ -123,6 +125,7 @@ router.get('/callback', async function(req, res) {
     console.error('Error getting tokens:', error.response?.data || error.message);
     res.status(500).send('Error during authentication');
   }
+  console.log('Session state:', req.session.state, 'Returned state:', state);
 });
 
 router.get('/dashboard', async function(req, res) {
@@ -134,7 +137,6 @@ router.get('/dashboard', async function(req, res) {
     }
   });
   res.json(userResponse.data);
-
 
 });
 
