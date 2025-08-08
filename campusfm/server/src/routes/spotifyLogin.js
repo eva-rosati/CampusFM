@@ -77,8 +77,6 @@ router.get('/callback', async function(req, res) {
     );
 
     const { access_token, refresh_token } = tokenResponse.data; // extract tokens from the response, temp token
-    req.session.spotifyID = spotifyID; // identify user by spotify id for routes
-    req.session.accessToken = access_token; // save to session
 
     
 
@@ -97,6 +95,10 @@ router.get('/callback', async function(req, res) {
     console.log('Token response:', tokenResponse.data);
     // get user info from spotify
     const { id: spotifyID, display_name: displayName, email } = userProfileResponse.data;
+    req.session.spotifyID = spotifyID; // identify user by spotify id for routes
+    req.session.accessToken = access_token; // save to session
+
+
 
     const topArtistsResponse = await axios.get('https://api.spotify.com/v1/me/top/artists', {
       headers: { 'Authorization': `Bearer ${access_token}` }
@@ -131,8 +133,13 @@ router.get('/callback', async function(req, res) {
       },
       { upsert: true, new: true }
     );
-
-    res.redirect('http://localhost:5173/dashboard');
+    req.session.save((err) => {
+      if (err) {
+        console.error('Session save error:', err);
+        return res.status(500).send('Failed to save session.');
+      }
+      res.redirect('http://localhost:5173/dashboard');
+    });
 
   } catch (error) { // catch any errors in the token exchange process
     console.error('Error getting tokens:', error.response?.data || error.message);
