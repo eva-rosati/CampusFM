@@ -11,6 +11,8 @@ export default function Landing() {
       <div className="blob blob5"></div>
       <div className="blob blob6"></div>
       <div className= "blob blob7"></div>
+      <div className= "blob blob8"></div>
+
 
 
       

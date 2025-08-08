@@ -11,30 +11,40 @@ export default function Dashboard() {
       credentials: 'include'
     })
       .then(res => res.json())
-      .then(data => setTopTracks(data)); // if your DB stores array of track names
+      .then(data => setTopTracks(data.items ? data.items.map(track => track.name) : [])); // ensure they are always arrays, avoiding map errors
+      // extract array from items
   
     fetch('https://fierce-bayou-71060-279ece732152.herokuapp.com/api/spotify/top-artists', {
       credentials: 'include'
     })
       .then(res => res.json())
-      .then(data => setTopArtists(data)); // same here
+      .then(data => setTopArtists(data.items ? data.items.map(artist => artist.name) : []));
   
     fetch('https://fierce-bayou-71060-279ece732152.herokuapp.com/api/spotify/top-genres', {
       credentials: 'include'
     })
       .then(res => res.json())
-      .then(data => setTopGenres(data));
+      .then(data => setTopGenres(Array.isArray(data) ? data : []));
   }, []);
   
 
   return (
+    <>
+    <h1 className="dashboard-title">Welcome to the Dashboard</h1>
     <div className="dashboard-container">
-      <h2>Your Top Tracks</h2>
-      <ul>{topTracks.map((track, i) => <li key={i}>{track}</li>)}</ul>
-      <h2>Your Top Artists</h2>
-      <ul>{topArtists.map((artist, i) => <li key={i}>{artist}</li>)}</ul>
-      <h2>Your Top Genres</h2>
-      <ul>{topGenres.map((genre, i) => <li key={i}>{genre}</li>)}</ul>
+      <div className="section-card">
+        <h2>Your Top Tracks</h2>
+        <ul>{topTracks.map((track, i) => <li key={i}>{track}</li>)}</ul>
+      </div>
+      <div className="section-card">
+        <h2>Your Top Artists</h2>
+        <ul>{topArtists.map((artist, i) => <li key={i}>{artist}</li>)}</ul>
+      </div>
+      <div className="section-card">
+        <h2>Your Top Genres</h2>
+        <ul>{topGenres.map((genre, i) => <li key={i}>{genre}</li>)}</ul>
+      </div>
     </div>
+    </>
   );
 }

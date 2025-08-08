@@ -147,12 +147,12 @@ h1 {
     animation-delay: 4s;
   }
   
-  .blob7 {
+  .blob8 {
     width: 400px;
     height: 400px;
-    background: #271ed7;
-    top: 10%;
-    left: 75%;
+    background: #d77717;
+    top: 5%;
+    left: 20%;
     animation: liquidBounce1 12s ease-in-out infinite alternate;
     animation-delay: 4s;
   }
