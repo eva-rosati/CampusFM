@@ -77,7 +77,9 @@ router.get('/callback', async function(req, res) {
     );
 
     const { access_token, refresh_token } = tokenResponse.data; // extract tokens from the response, temp token
+    req.session.spotifyID = spotifyID; // identify user by spotify id for routes
     req.session.accessToken = access_token; // save to session
+
     
 
     // encrypt tokens using the imported encryption function 
