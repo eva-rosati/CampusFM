@@ -26,7 +26,8 @@ const MONGO_URI = process.env.MONGO_URI;
 
 app.use(cors({
     origin: [//'http://localhost:5173',
-      'https://ambent-tiramisu-637bf2.netlify.app'
+      //'https://ambent-tiramisu-637bf2.netlify.app'
+      'https://campusfm.org'
     ],
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
