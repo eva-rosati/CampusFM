@@ -25,7 +25,9 @@ const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: [//'http://localhost:5173',
+      'https://ambent-tiramisu-637bf2.netlify.app'
+    ],
     credentials: true,
     methods: ['GET', 'POST', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization']

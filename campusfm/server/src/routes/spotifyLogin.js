@@ -138,7 +138,7 @@ router.get('/callback', async function(req, res) {
         console.error('Session save error:', err);
         return res.status(500).send('Failed to save session.');
       }
-      res.redirect('http://localhost:5173/dashboard');
+      res.redirect('https://ambent-tiramisu-637bf2.netlify.app/dashboard');
     });
 
   } catch (error) { // catch any errors in the token exchange process
